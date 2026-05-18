@@ -3,64 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Creator</title>
+    <title>BlogAI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background: #1a1a1a;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: #e0e0e0;
+            padding: 20px 0;
+        }
+        .navbar-custom {
+            background: #2d2d2d;
+            border-bottom: 1px solid #444444;
+        }
+        .navbar-custom .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #ffffff !important;
         }
         .container-wrapper {
-            width: 100%;
-            max-width: 700px;
-            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
         }
         .card {
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            border: none;
-            border-radius: 12px;
             background-color: #2d2d2d;
+            border: 1px solid #444444;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         }
         .card-header {
-            background: #1a1a1a;
-            border: none;
-            border-radius: 12px 12px 0 0;
+            background-color: #1a1a1a;
+            border-bottom: 1px solid #444444;
         }
         .card-body {
             background-color: #2d2d2d;
         }
         .btn-primary {
-            background: #333333;
-            border: 1px solid #555555;
-            padding: 10px 30px;
+            background: #0d6efd;
+            border: none;
+            padding: 10px 20px;
             font-weight: 600;
-            transition: transform 0.2s;
-            color: #ffffff;
+            transition: all 0.2s;
         }
         .btn-primary:hover {
-            transform: translateY(-2px);
-            background: #444444;
-            border: 1px solid #666666;
-            color: #ffffff;
+            background: #0b5ed7;
+            transform: translateY(-1px);
         }
         .btn-primary:disabled {
-            background: #ccc;
+            background: #6c757d;
             cursor: not-allowed;
         }
-        .response-section {
-            margin-top: 20px;
-            min-height: 100px;
-            padding: 15px;
-            background-color: #1a1a1a;
-            border-radius: 8px;
-            display: none;
-            border: 1px solid #444444;
+        .btn-outline-light {
+            color: #e0e0e0;
+            border-color: #444444;
         }
-        .response-section.show {
-            display: block;
+        .btn-outline-light:hover {
+            background: #444444;
+            border-color: #555555;
+            color: #ffffff;
+        }
+        .btn-danger {
+            background: #dc3545;
+            border: none;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .blog-item {
+            padding: 15px;
+            border-bottom: 1px solid #444444;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .blog-item:hover {
+            background: #353535;
+        }
+        .blog-item:last-child {
+            border-bottom: none;
+        }
+        .blog-item h6 {
+            margin: 0 0 5px 0;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .blog-item .date {
+            font-size: 0.85rem;
+            color: #888888;
         }
         .spinner {
             display: none;
@@ -71,76 +99,127 @@
         .error-message {
             color: #dc3545;
             display: none;
+            padding: 10px;
+            background: #3d1f21;
+            border-radius: 4px;
+            margin-bottom: 15px;
         }
         .error-message.show {
             display: block;
         }
-        .story-section {
-            margin-top: 20px;
-            padding: 15px;
-            border-top: 1px solid #444444;
+        .success-message {
+            color: #28a745;
             display: none;
+            padding: 10px;
+            background: #1f3d28;
+            border-radius: 4px;
+            margin-bottom: 15px;
         }
-        .story-section.show {
+        .success-message.show {
             display: block;
         }
-        .story-section h5 {
-            margin-bottom: 15px;
-            color: #ffffff;
+        .view {
+            display: none;
         }
-        .story-content {
+        .view.active {
+            display: block;
+        }
+        .blog-content {
             line-height: 1.8;
             color: #e0e0e0;
-            font-size: 1rem;
+            font-size: 1.1rem;
             white-space: pre-wrap;
             word-wrap: break-word;
-            margin-bottom: 20px;
+            margin: 15px 0;
             padding: 15px;
             background-color: #1a1a1a;
             border-radius: 8px;
-            border: 1px solid #444444;
+            border-left: 3px solid #0d6efd;
+        }
+        .blog-title {
+            color: #ffffff;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .blog-date {
+            color: #888888;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888888;
+        }
+        .empty-state p {
+            font-size: 1.1rem;
         }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="javascript:showListView()">Blogger</a>
+        </div>
+    </nav>
+
     <div class="container-wrapper">
-        <div class="card">
-            <div class="card-header border-bottom border-secondary">
-                <h2 class="card-title text-white mb-0">Story Creator</h2>
-            </div>
-            <div class="card-body">
-                <form id="storyForm">
-                    <div class="mb-3">
-                        <label for="promptInput" class="form-label text-white">Enter a story prompt:</label>
-                        <textarea 
-                            class="form-control form-control-lg" 
-                            id="promptInput" 
-                            placeholder="e.g., A mysterious door appears in the forest"
-                            required
-                            rows="3"
-                        ></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-dark btn-lg w-100 text-white border-secondary">
-                        <span class="spinner" id="spinner">
-                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        </span>
-                        Generate Story
-                    </button>
-                </form>
-
-                <div class="response-section" id="responseSection">
-                    <div class="error-message" id="errorMessage"></div>
+        <!-- List View -->
+        <div id="listView" class="view active">
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Create New Blog Post</h5>
                 </div>
+                <div class="card-body">
+                    <div id="errorMessageList" class="error-message"></div>
+                    <div id="successMessageList" class="success-message"></div>
+                    
+                    <form id="createBlogForm">
+                        <div class="mb-3">
+                            <label for="topicInput" class="form-label">Blog Topic</label>
+                            <input type="text" class="form-control" id="topicInput" placeholder="Enter a topic for your blog post..." required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <span id="submitText">Generate Blog Post</span>
+                            <span id="spinner" class="spinner">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
 
-                <div class="story-section" id="storySection">
-                    <h5>Your Story:</h5>
-                    <div class="story-content" id="storyContent"></div>
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Blog Posts</h5>
+                </div>
+                <div class="card-body p-0" id="blogsList">
+                    <div class="empty-state">
+                        <p>No blog posts yet. Create one to get started!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail View -->
+        <div id="detailView" class="view">
+            <div class="card mt-4">
+                <div class="card-body">
+                    <button class="btn btn-outline-light mb-4" onclick="showListView()">← Back to List</button>
+                    
+                    <div id="blogDetail"></div>
+                    
+                    <div class="mt-4">
+                        <button class="btn btn-danger" onclick="deleteBlog()">Delete Post</button>
+                        <button class="btn btn-outline-light ms-2" onclick="showListView()">← Back to List</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
-</html></div>
+</html>

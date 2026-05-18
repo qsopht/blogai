@@ -1,5 +1,5 @@
 {
-  "name": "storybook",
+  "name": "blogai",
   "version": "1.0.0",
   "description": "Create a generative storybook that generates similar words based on a given word.",
   "main": "server.js",
@@ -10,7 +10,7 @@
     "build:azure": "echo Build step not required for this app"
   },
   "keywords": [
-    "storybook",
+    "blogai",
     "words",
     "similar"
   ],
@@ -19,6 +19,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "mysql2": "^3.6.5",
+    "node-schedule": "^2.1.1"
   }
 }
