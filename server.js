@@ -454,10 +454,10 @@ Ensure the JSON is valid and properly formatted.`;
 }
 
 // Function to automatically generate blog posts
-async function autoGenerateBlog() {
+async function autoGenerateBlog(retryCount = 0, maxRetries = 3) {
     try {
         const topic = SAMPLE_TOPICS[Math.floor(Math.random() * SAMPLE_TOPICS.length)];
-        console.log(`🤖 Auto-generating blog about: "${topic}"`);
+        console.log(`🤖 Auto-generating blog about: "${topic}"${retryCount > 0 ? ` (Attempt ${retryCount + 1})` : ''}`);
         
         const blogData = await generateBlogContent(topic);
         
@@ -474,6 +474,12 @@ async function autoGenerateBlog() {
         // Automatically improve prompt after blog generation
         await improvePromptAfterBlog(blogId, blogData.title, blogData.content);
     } catch (error) {
+        if (retryCount < maxRetries && error.message.includes('Invalid JSON from LLM')) {
+            console.warn(`⚠️  JSON parse error, retrying... (${retryCount + 1}/${maxRetries})`);
+            // Wait 1 second before retrying
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return autoGenerateBlog(retryCount + 1, maxRetries);
+        }
         console.error('❌ Error auto-generating blog:', error.message);
     }
 }
