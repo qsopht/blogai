@@ -414,7 +414,25 @@ Ensure the JSON is valid and properly formatted.`;
         throw new Error('Could not parse JSON from LLM response');
     }
 
-    const blogData = JSON.parse(jsonMatch[0]);
+    let blogData;
+    try {
+        blogData = JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+        // JSON parsing failed - try to sanitize the string
+        // This handles cases where the LLM returns unescaped newlines or control characters
+        const sanitized = jsonMatch[0]
+            .replace(/\n/g, '\\n')
+            .replace(/\r/g, '\\r')
+            .replace(/\t/g, '\\t');
+        
+        try {
+            blogData = JSON.parse(sanitized);
+        } catch (sanitizeError) {
+            console.error('Failed to parse LLM response:', jsonMatch[0].substring(0, 200));
+            throw new Error(`Invalid JSON from LLM: ${parseError.message}`);
+        }
+    }
+    
     return blogData;
 }
 

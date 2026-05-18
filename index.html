@@ -34,6 +34,7 @@
         .card-header {
             background-color: #1a1a1a;
             border-bottom: 1px solid #444444;
+            color: #ffffff;
         }
         .card-body {
             background-color: #2d2d2d;
@@ -170,29 +171,6 @@
         <div id="listView" class="view active">
             <div class="card mt-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Create New Blog Post</h5>
-                </div>
-                <div class="card-body">
-                    <div id="errorMessageList" class="error-message"></div>
-                    <div id="successMessageList" class="success-message"></div>
-                    
-                    <form id="createBlogForm">
-                        <div class="mb-3">
-                            <label for="topicInput" class="form-label">Blog Topic</label>
-                            <input type="text" class="form-control" id="topicInput" placeholder="Enter a topic for your blog post..." required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <span id="submitText">Generate Blog Post</span>
-                            <span id="spinner" class="spinner">
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            </span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card mt-4">
-                <div class="card-header">
                     <h5 class="mb-0">Blog Posts</h5>
                 </div>
                 <div class="card-body p-0" id="blogsList">
@@ -212,7 +190,6 @@
                     <div id="blogDetail"></div>
                     
                     <div class="mt-4">
-                        <button class="btn btn-danger" onclick="deleteBlog()">Delete Post</button>
                         <button class="btn btn-outline-light ms-2" onclick="showListView()">← Back to List</button>
                     </div>
                 </div>

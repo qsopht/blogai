@@ -1,15 +1,17 @@
 // DOM Elements
-const createBlogForm = document.getElementById('createBlogForm');
-const topicInput = document.getElementById('topicInput');
-const submitButton = createBlogForm.querySelector('button[type="submit"]');
-const submitText = document.getElementById('submitText');
-const spinner = document.getElementById('spinner');
 const blogsList = document.getElementById('blogsList');
-const errorMessageList = document.getElementById('errorMessageList');
-const successMessageList = document.getElementById('successMessageList');
 const listView = document.getElementById('listView');
 const detailView = document.getElementById('detailView');
 const blogDetail = document.getElementById('blogDetail');
+
+// Optional elements (for form if it exists)
+const createBlogForm = document.getElementById('createBlogForm');
+const topicInput = createBlogForm ? document.getElementById('topicInput') : null;
+const submitButton = createBlogForm ? createBlogForm.querySelector('button[type="submit"]') : null;
+const submitText = document.getElementById('submitText');
+const spinner = document.getElementById('spinner');
+const errorMessageList = document.getElementById('errorMessageList');
+const successMessageList = document.getElementById('successMessageList');
 
 let currentBlogId = null;
 
@@ -18,46 +20,48 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBlogs();
 });
 
-// Form submission
-createBlogForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const topic = topicInput.value.trim();
-    if (!topic) {
-        showError('Please enter a topic', 'list');
-        return;
-    }
-    
-    hideError('list');
-    showLoading(true);
-    
-    try {
-        const res = await fetch('/api/blogs', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ topic })
-        });
+// Form submission (only if form exists)
+if (createBlogForm) {
+    createBlogForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error || 'Failed to create blog');
+        const topic = topicInput.value.trim();
+        if (!topic) {
+            showError('Please enter a topic', 'list');
+            return;
         }
         
-        const blog = await res.json();
+        hideError('list');
+        showLoading(true);
         
-        showSuccess('Blog post created successfully!', 'list');
-        topicInput.value = '';
-        
-        // Reload blogs
-        await loadBlogs();
-    } catch (error) {
-        showError(error.message, 'list');
-    } finally {
-        showLoading(false);
-    }
-});
+        try {
+            const res = await fetch('/api/blogs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ topic })
+            });
+            
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Failed to create blog');
+            }
+            
+            const blog = await res.json();
+            
+            showSuccess('Blog post created successfully!', 'list');
+            topicInput.value = '';
+            
+            // Reload blogs
+            await loadBlogs();
+        } catch (error) {
+            showError(error.message, 'list');
+        } finally {
+            showLoading(false);
+        }
+    });
+}
 
 async function loadBlogs() {
     try {
@@ -149,6 +153,8 @@ function showError(message, view) {
     if (errorElement) {
         errorElement.textContent = message;
         errorElement.classList.add('show');
+    } else {
+        console.error('Error:', message);
     }
 }
 
@@ -170,10 +176,14 @@ function showSuccess(message, view) {
         setTimeout(() => {
             successElement.classList.remove('show');
         }, 3000);
+    } else {
+        console.log('Success:', message);
     }
 }
 
 function showLoading(isLoading) {
+    if (!submitButton) return; // No form, skip
+    
     submitButton.disabled = isLoading;
     if (isLoading) {
         submitText.style.display = 'none';
