@@ -415,21 +415,38 @@ Ensure the JSON is valid and properly formatted.`;
     }
 
     let blogData;
+    let jsonString = jsonMatch[0];
+    
     try {
-        blogData = JSON.parse(jsonMatch[0]);
+        blogData = JSON.parse(jsonString);
     } catch (parseError) {
-        // JSON parsing failed - try to sanitize the string
-        // This handles cases where the LLM returns unescaped newlines or control characters
-        const sanitized = jsonMatch[0]
-            .replace(/\n/g, '\\n')
-            .replace(/\r/g, '\\r')
-            .replace(/\t/g, '\\t');
+        // JSON parsing failed - try to sanitize actual control characters
+        // Replace literal control characters (not escaped) with their escaped equivalents
+        jsonString = jsonString
+            .replace(/[\n]/g, '\\n')      // actual newlines
+            .replace(/[\r]/g, '\\r')      // actual carriage returns
+            .replace(/[\t]/g, '\\t')      // actual tabs
+            .replace(/[\b]/g, '\\b')      // actual backspace
+            .replace(/[\f]/g, '\\f');     // actual form feed
         
         try {
-            blogData = JSON.parse(sanitized);
+            blogData = JSON.parse(jsonString);
         } catch (sanitizeError) {
-            console.error('Failed to parse LLM response:', jsonMatch[0].substring(0, 200));
-            throw new Error(`Invalid JSON from LLM: ${parseError.message}`);
+            // Still failing - extract just the content and title manually
+            console.warn('JSON parsing failed, attempting to extract fields manually...');
+            
+            const titleMatch = jsonString.match(/"title"\s*:\s*"([^"]*(?:\\"[^"]*)*)"/);
+            const contentMatch = jsonString.match(/"content"\s*:\s*"([\s\S]*?)"\s*\}/);
+            
+            if (titleMatch && contentMatch) {
+                blogData = {
+                    title: titleMatch[1].replace(/\\"/g, '"'),
+                    content: contentMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n')
+                };
+            } else {
+                console.error('Failed to parse LLM response:', jsonMatch[0].substring(0, 300));
+                throw new Error(`Invalid JSON from LLM: ${parseError.message}`);
+            }
         }
     }
     
