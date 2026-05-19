@@ -1,7 +1,7 @@
 {
   "name": "blogai",
   "version": "1.0.0",
-  "description": "Create a generative storybook that generates similar words based on a given word.",
+  "description": "Auto create ai blog posts with llm feedback and prompt evolution.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
